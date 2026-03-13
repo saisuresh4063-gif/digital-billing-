@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Digital Accounting and Billing System</title>
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    body{
+      font-family:Arial, sans-serif;
+      background:#f4f4f4;
+      min-height:100vh;
+    }
+
+    .container, .billing, .admin-panel{
+      width:92%;
+      max-width:520px;
+      margin:40px auto;
+      background:#fff;
+      padding:25px;
+      border-radius:12px;
+      box-shadow:0 0 12px rgba(0,0,0,0.15);
+    }
+
+    .billing, .admin-panel{
+      max-width:1200px;
+    }
+
+    h1,h2,h3{
+      text-align:center;
+      margin-bottom:20px;
+      color:#222;
+    }
+
+    label{
+      display:block;
+      margin-top:10px;
+      margin-bottom:6px;
+      font-weight:bold;
+      color:#333;
+    }
+
+    input, select{
+      width:100%;
+      padding:10px;
+      border:1px solid #ccc;
+      border-radius:6px;
+      margin-bottom:10px;
+      font-size:15px;
+      outline:none;
+    }
+
+    input:focus, select:focus{
+      border-color:#007bff;
+    }
+
+    button{
+      width:100%;
+      padding:12px;
+      border:none;
+      border-radius:6px;
+      background:green;
+      color:white;
+      cursor:pointer;
+      margin-top:10px;
+      font-size:15px;
+    }
+
+    button:hover{
+      opacity:0.92;
+    }
+
+    .btn-blue{ background:#007bff; }
+    .btn-red{ background:#dc3545; }
+    .btn-orange{ background:#ff9800; }
+    .btn-gray{ background:#555; }
+    .btn-purple{ background:#6f42c1; }
+
+    .row{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .row button{
+      flex:1;
+      min-width:180px;
+    }
+
+    .top-bar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:20px;
+    }
+
+    .top-bar .small-btn{
+      width:auto;
+      padding:10px 16px;
+      margin-top:0;
+    }
+
+    .welcome{
+      font-size:16px;
+      font-weight:bold;
+      color:#222;
+    }
+
+    .note{
+      background:#eef6ff;
+      border-left:4px solid #007bff;
+      padding:10px;
+      border-radius:6px;
+      margin:10px 0 15px;
+      color:#333;
+      line-height:1.6;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:20px;
+      background:#fff;
+    }
+
+    th, td{
+      border:1px solid #ccc;
+      padding:10px;
+      text-align:center;
+      vertical-align:top;
+    }
+
+    th{
+      background:#333;
+      color:#fff;
+    }
+
+    .summary{
+      margin-top:18px;
+      padding:12px;
+      background:#f9f9f9;
+      border:1px solid #ddd;
+      border-radius:8px;
+      font-weight:bold;
+      text-align:right;
+    }
+
+    .hidden{
+      display:none;
+    }
+
+    .product-box{
+      background:#fafafa;
+      border:1px solid #ddd;
+      border-radius:8px;
+      padding:15px;
+      margin-top:10px;
+    }
+
+    .section-title{
+      margin-top:20px;
+      margin-bottom:10px;
+      font-size:18px;
+      font-weight:bold;
+      color:#222;
+    }
+
+    ul.product-list{
+      margin-left:18px;
+      text-align:left;
+    }
+
+    ul.product-list li{
+      margin-bottom:4px;
+    }
+
+    @media (max-width:700px){
+      .container, .billing, .admin-panel{
+        width:95%;
+        margin:20px auto;
+        padding:18px;
+      }
+
+      table{
+        font-size:13px;
+      }
+
+      th, td{
+        padding:8px;
+      }
+
+      .row button{
+        min-width:100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HOME PAGE -->
+  <div class="container" id="homePage">
+    <h1>Digital Accounting and Billing System</h1>
+    <div class="note">
+      Choose login type below.
+    </div>
+
+    <div class="row">
+      <button class="btn-blue" onclick="showEmployeeLogin()">Employee Login</button>
+      <button class="btn-orange" onclick="showEmployeeSignup()">Employee Sign Up</button>
+    </div>
+
+    <div class="row" style="margin-top:10px;">
+      <button class="btn-gray" onclick="showAdminLogin()">Admin Login</button>
+    </div>
+  </div>
+
+  <!-- EMPLOYEE SIGNUP -->
+  <div class="container hidden" id="employeeSignupPage">
+    <h2>Employee Sign Up</h2>
+
+    <label for="signupUser">Employee Username</label>
+    <input type="text" id="signupUser" placeholder="Enter employee username">
+
+    <button onclick="employeeSignup()">Create Account</button>
+    <button class="btn-gray" onclick="goHome()">Back</button>
+  </div>
+
+  <!-- EMPLOYEE LOGIN -->
+  <div class="container hidden" id="employeeLoginPage">
+    <h2>Employee Login</h2>
+
+    <label for="employeeLoginUser">Employee Username</label>
+    <input type="text" id="employeeLoginUser" placeholder="Enter employee username">
+
+    <label for="employeeLoginPass">Password</label>
+    <input type="password" id="employeeLoginPass" placeholder="Enter password">
+
+    <button onclick="employeeLogin()">Login</button>
+    <button class="btn-gray" onclick="goHome()">Back</button>
+  </div>
+
+  <!-- ADMIN LOGIN -->
+  <div class="container hidden" id="adminLoginPage">
+    <h2>Admin Login</h2>
+
+    <label for="adminUser">Admin Username</label>
+    <input type="text" id="adminUser" placeholder="Enter admin username">
+
+    <label for="adminPass">Admin Password</label>
+    <input type="password" id="adminPass" placeholder="Enter admin password">
+
+    <button onclick="adminLogin()">Login</button>
+    <button class="btn-gray" onclick="goHome()">Back</button>
+  </div>
+
+  <!-- EMPLOYEE BILLING PAGE -->
+  <div class="billing hidden" id="billingPage">
+    <div class="top-bar">
+      <div class="welcome" id="employeeWelcome">Welcome</div>
+      <button class="small-btn btn-red" onclick="employeeLogout()">Logout</button>
+    </div>
+
+    <h2>Employee Billing Page</h2>
+
+    <label for="customer">Customer Name</label>
+    <input type="text" id="customer" placeholder="Enter customer name">
+
+    <div class="product-box">
+      <h3>Add Product</h3>
+
+      <label for="item">Item Name</label>
+      <select id="item" onchange="setAutoPrice()">
+        <option value="">Select Item</option>
+        <option value="Rice">Rice</option>
+        <option value="Sugar">Sugar</option>
+        <option value="Oil">Oil</option>
+        <option value="Soap">Soap</option>
+        <option value="Milk">Milk</option>
+        <option value="Notebook">Notebook</option>
+        <option value="Pen">Pen</option>
+        <option value="Biscuit">Biscuit</option>
+      </select>
+
+      <label for="qty">Quantity</label>
+      <input type="number" id="qty" placeholder="Enter quantity" min="1" oninput="setAutoPrice()">
+
+      <label for="unitPrice">Unit Price</label>
+      <input type="number" id="unitPrice" placeholder="Unit price" readonly>
+
+      <label for="price">Total Price</label>
+      <input type="number" id="price" placeholder="Total auto fills" readonly>
+
+      <div class="row">
+        <button class="btn-blue" onclick="addProductToCurrentBill()">Add Product</button>
+        <button class="btn-red" onclick="clearCurrentProducts()">Clear Product List</button>
+      </div>
+    </div>
+
+    <div class="section-title">Current Customer Product List</div>
+    <table>
+      <thead>
+        <tr>
+          <th>S.No</th>
+          <th>Item</th>
+          <th>Quantity</th>
+          <th>Unit Price</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody id="currentProductBody"></tbody>
+    </table>
+
+    <div class="summary" id="currentBillTotalBox">Current Bill Total: ₹0.00</div>
+
+    <div class="row">
+      <button onclick="saveFullBill()">Save Full Bill</button>
+      <button class="btn-purple" onclick="printLatestBill()">Print Bill</button>
+      <button class="btn-red" onclick="clearEmployeeBills()">Clear My Stored Data</button>
+    </div>
+
+    <div class="section-title">Saved Customer Bills</div>
+    <table>
+      <thead>
+        <tr>
+          <th>S.No</th>
+          <th>Customer</th>
+          <th>Products</th>
+          <th>Bill Total</th>
+        </tr>
+      </thead>
+      <tbody id="billBody"></tbody>
+    </table>
+
+    <div class="summary" id="grandTotalBox">Grand Total: ₹0.00</div>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div class="admin-panel hidden" id="adminPanel">
+    <div class="top-bar">
+      <div class="welcome">Admin Panel</div>
+      <button class="small-btn btn-red" onclick="adminLogout()">Logout</button>
+    </div>
+
+    <h2>Search Employee Billing Data</h2>
+
+    <label for="searchEmployeeName">Employee Username</label>
+    <input type="text" id="searchEmployeeName" placeholder="Type employee username">
+
+    <div class="row">
+      <button class="btn-blue" onclick="searchEmployeeData()">Show Employee Data</button>
+      <button class="btn-blue" onclick="downloadAdminEmployeeBills()">Download Employee Data</button>
+      <button class="btn-red" onclick="deleteEmployeeData()">Delete Employee Data</button>
+    </div>
+
+    <div class="note" id="adminSearchInfo">
+      Type employee username and click show.
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>S.No</th>
+          <th>Customer</th>
+          <th>Products</th>
+          <th>Bill Total</th>
+        </tr>
+      </thead>
+      <tbody id="adminBillBody"></tbody>
+    </table>
+
+    <div class="summary" id="adminGrandTotalBox">Grand Total: ₹0.00</div>
+  </div>
+
+  <script>
+    let currentEmployee = "";
+    let currentAdminViewedEmployee = "";
+    let currentProducts = [];
+    let latestSavedBill = null;
+
+    const productRates = {
+      Rice: 60,
+      Sugar: 45,
+      Oil: 50,
+      Soap: 35,
+      Milk: 28,
+      Notebook: 50,
+      Pen: 12,
+      Biscuit: 10
+    };
+
+    function hideAllPages(){
+      document.getElementById("homePage").classList.add("hidden");
+      document.getElementById("employeeSignupPage").classList.add("hidden");
+      document.getElementById("employeeLoginPage").classList.add("hidden");
+      document.getElementById("adminLoginPage").classList.add("hidden");
+      document.getElementById("billingPage").classList.add("hidden");
+      document.getElementById("adminPanel").classList.add("hidden");
+    }
+
+    function goHome(){
+      hideAllPages();
+      document.getElementById("homePage").classList.remove("hidden");
+      clearFields();
+    }
+
+    function showEmployeeSignup(){
+      hideAllPages();
+      document.getElementById("employeeSignupPage").classList.remove("hidden");
+    }
+
+    function showEmployeeLogin(){
+      hideAllPages();
+      document.getElementById("employeeLoginPage").classList.remove("hidden");
+    }
+
+    function showAdminLogin(){
+      hideAllPages();
+      document.getElementById("adminLoginPage").classList.remove("hidden");
+    }
+
+    function clearFields(){
+      document.getElementById("signupUser").value = "";
+      document.getElementById("employeeLoginUser").value = "";
+      document.getElementById("employeeLoginPass").value = "";
+      document.getElementById("adminUser").value = "";
+      document.getElementById("adminPass").value = "";
+    }
+
+    function getEmployees(){
+      return JSON.parse(localStorage.getItem("employees")) || [];
+    }
+
+    function saveEmployees(employees){
+      localStorage.setItem("employees", JSON.stringify(employees));
+    }
+
+    function employeeSignup(){
+      const username = document.getElementById("signupUser").value.trim();
+
+      if(username === ""){
+        alert("Please enter employee username");
+        return;
+      }
+
+      let employees = getEmployees();
+
+      if(employees.includes(username)){
+        alert("Employee username already exists");
+        return;
+      }
+
+      employees.push(username);
+      saveEmployees(employees);
+
+      if(!localStorage.getItem("bills_" + username)){
+        localStorage.setItem("bills_" + username, JSON.stringify([]));
+      }
+
+      alert("Employee account created successfully");
+      goHome();
+    }
+
+    function employeeLogin(){
+      const username = document.getElementById("employeeLoginUser").value.trim();
+      const password = document.getElementById("employeeLoginPass").value.trim();
+      const employees = getEmployees();
+
+      if(username === ""){
+        alert("Please enter employee username");
+        return;
+      }
+
+      if(!employees.includes(username)){
+        alert("Employee not found. Please sign up first.");
+        return;
+      }
+
+      if(password !== "123456"){
+        alert("Invalid password");
+        return;
+      }
+
+      currentEmployee = username;
+      currentProducts = [];
+      latestSavedBill = null;
+      localStorage.setItem("currentEmployee", currentEmployee);
+
+      hideAllPages();
+      document.getElementById("billingPage").classList.remove("hidden");
+      document.getElementById("employeeWelcome").innerText = "Welcome, " + currentEmployee;
+
+      document.getElementById("customer").value = "";
+      document.getElementById("item").value = "";
+      document.getElementById("qty").value = "";
+      document.getElementById("unitPrice").value = "";
+      document.getElementById("price").value = "";
+
+      renderCurrentProducts();
+      loadEmployeeBills();
+
+      document.getElementById("employeeLoginUser").value = "";
+      document.getElementById("employeeLoginPass").value = "";
+    }
+
+    function employeeLogout(){
+      currentEmployee = "";
+      currentProducts = [];
+      latestSavedBill = null;
+      localStorage.removeItem("currentEmployee");
+      goHome();
+    }
+
+    function getEmployeeBills(username){
+      return JSON.parse(localStorage.getItem("bills_" + username)) || [];
+    }
+
+    function saveEmployeeBills(username, bills){
+      localStorage.setItem("bills_" + username, JSON.stringify(bills));
+    }
+
+    function setAutoPrice(){
+      const item = document.getElementById("item").value;
+      const qty = parseInt(document.getElementById("qty").value) || 0;
+      const unitPrice = productRates[item] || 0;
+      const totalPrice = qty * unitPrice;
+
+      document.getElementById("unitPrice").value = unitPrice > 0 ? unitPrice : "";
+      document.getElementById("price").value = totalPrice > 0 ? totalPrice : "";
+    }
+
+    function addProductToCurrentBill(){
+      const item = document.getElementById("item").value;
+      const qty = parseInt(document.getElementById("qty").value);
+      const unitPrice = parseFloat(document.getElementById("unitPrice").value);
+      const total = parseFloat(document.getElementById("price").value);
+
+      if(item === "" || isNaN(qty) || isNaN(unitPrice) || isNaN(total) || qty <= 0){
+        alert("Please select product and quantity correctly");
+        return;
+      }
+
+      currentProducts.push({
+        item: item,
+        qty: qty,
+        unitPrice: unitPrice,
+        total: total
+      });
+
+      renderCurrentProducts();
+
+      document.getElementById("item").value = "";
+      document.getElementById("qty").value = "";
+      document.getElementById("unitPrice").value = "";
+      document.getElementById("price").value = "";
+    }
+
+    function renderCurrentProducts(){
+      const tbody = document.getElementById("currentProductBody");
+      tbody.innerHTML = "";
+
+      let total = 0;
+
+      currentProducts.forEach((product, index) => {
+        const row = tbody.insertRow();
+        row.insertCell(0).innerHTML = index + 1;
+        row.insertCell(1).innerHTML = product.item;
+        row.insertCell(2).innerHTML = product.qty;
+        row.insertCell(3).innerHTML = "₹" + Number(product.unitPrice).toFixed(2);
+        row.insertCell(4).innerHTML = "₹" + Number(product.total).toFixed(2);
+        total += Number(product.total);
+      });
+
+      document.getElementById("currentBillTotalBox").innerHTML = "Current Bill Total: ₹" + total.toFixed(2);
+    }
+
+    function clearCurrentProducts(){
+      currentProducts = [];
+      renderCurrentProducts();
+      document.getElementById("item").value = "";
+      document.getElementById("qty").value = "";
+      document.getElementById("unitPrice").value = "";
+      document.getElementById("price").value = "";
+    }
+
+    function saveFullBill(){
+      if(currentEmployee === ""){
+        alert("Employee not logged in");
+        return;
+      }
+
+      const customer = document.getElementById("customer").value.trim();
+
+      if(customer === ""){
+        alert("Please enter customer name");
+        return;
+      }
+
+      if(currentProducts.length === 0){
+        alert("Please add at least one product");
+        return;
+      }
+
+      let billTotal = 0;
+      currentProducts.forEach(product => {
+        billTotal += Number(product.total);
+      });
+
+      const savedProducts = JSON.parse(JSON.stringify(currentProducts));
+      const billData = {
+        customer: customer,
+        products: savedProducts,
+        billTotal: billTotal,
+        date: new Date().toLocaleString()
+      };
+
+      const bills = getEmployeeBills(currentEmployee);
+      bills.push(billData);
+
+      saveEmployeeBills(currentEmployee, bills);
+      latestSavedBill = billData;
+      loadEmployeeBills();
+
+      document.getElementById("customer").value = "";
+      currentProducts = [];
+      renderCurrentProducts();
+
+      alert("Full bill saved successfully");
+    }
+
+    function loadEmployeeBills(){
+      if(currentEmployee === "") return;
+
+      const bills = getEmployeeBills(currentEmployee);
+      const billBody = document.getElementById("billBody");
+      billBody.innerHTML = "";
+
+      let grandTotal = 0;
+
+      bills.forEach((bill, index) => {
+        const row = billBody.insertRow();
+        row.insertCell(0).innerHTML = index + 1;
+        row.insertCell(1).innerHTML = bill.customer;
+
+        let productHtml = "<ul class='product-list'>";
+        bill.products.forEach(product => {
+          productHtml += "<li>" + product.item +
+            " - Qty: " + product.qty +
+            " - Unit: ₹" + Number(product.unitPrice).toFixed(2) +
+            " - Total: ₹" + Number(product.total).toFixed(2) +
+            "</li>";
+        });
+        productHtml += "</ul>";
+
+        row.insertCell(2).innerHTML = productHtml;
+        row.insertCell(3).innerHTML = "₹" + Number(bill.billTotal).toFixed(2);
+
+        grandTotal += Number(bill.billTotal);
+      });
+
+      document.getElementById("grandTotalBox").innerHTML = "Grand Total: ₹" + grandTotal.toFixed(2);
+    }
+
+    function clearEmployeeBills(){
+      if(currentEmployee === ""){
+        alert("Employee not logged in");
+        return;
+      }
+
+      const confirmClear = confirm("Are you sure you want to clear your stored data?");
+      if(confirmClear){
+        saveEmployeeBills(currentEmployee, []);
+        latestSavedBill = null;
+        loadEmployeeBills();
+      }
+    }
+
+    function printLatestBill(){
+      if(!latestSavedBill){
+        alert("Please save a bill first, then print it");
+        return;
+      }
+
+      let rows = "";
+      latestSavedBill.products.forEach((product, index) => {
+        rows += `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${product.item}</td>
+            <td>${product.qty}</td>
+            <td>₹${Number(product.unitPrice).toFixed(2)}</td>
+            <td>₹${Number(product.total).toFixed(2)}</td>
+          </tr>
+        `;
+      });
+
+      const printWindow = window.open("", "", "width=900,height=700");
+      printWindow.document.write(`
+        <html>
+        <head>
+          <title>PR Super Market Bill</title>
+          <style>
+            body{
+              font-family:Arial, sans-serif;
+              padding:30px;
+              color:#000;
+            }
+            h1,h2,p{
+              text-align:center;
+              margin-bottom:8px;
+            }
+            .info{
+              margin:20px 0;
+              line-height:1.8;
+            }
+            table{
+              width:100%;
+              border-collapse:collapse;
+              margin-top:20px;
+            }
+            th,td{
+              border:1px solid #000;
+              padding:10px;
+              text-align:center;
+            }
+            th{
+              background:#eee;
+            }
+            .total{
+              margin-top:20px;
+              text-align:right;
+              font-size:18px;
+              font-weight:bold;
+            }
+          </style>
+        </head>
+        <body>
+          <h1>PR Super Market</h1>
+          <h2>Customer Bill</h2>
+          <div class="info">
+            <strong>Employee:</strong> ${currentEmployee}<br>
+            <strong>Customer Name:</strong> ${latestSavedBill.customer}<br>
+            <strong>Date:</strong> ${latestSavedBill.date}
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>S.No</th>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows}
+            </tbody>
+          </table>
+
+          <div class="total">Grand Total: ₹${Number(latestSavedBill.billTotal).toFixed(2)}</div>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.print();
+    }
+
+    function adminLogin(){
+      const adminUser = document.getElementById("adminUser").value.trim();
+      const adminPass = document.getElementById("adminPass").value.trim();
+
+      if(adminUser === "admin" && adminPass === "admin1234"){
+        hideAllPages();
+        document.getElementById("adminPanel").classList.remove("hidden");
+        document.getElementById("adminBillBody").innerHTML = "";
+        document.getElementById("adminGrandTotalBox").innerHTML = "Grand Total: ₹0.00";
+        document.getElementById("adminSearchInfo").innerText = "Type employee username and click show.";
+        document.getElementById("searchEmployeeName").value = "";
+        currentAdminViewedEmployee = "";
+      } else {
+        alert("Invalid admin login");
+      }
+    }
+
+    function adminLogout(){
+      goHome();
+      document.getElementById("adminBillBody").innerHTML = "";
+      document.getElementById("adminGrandTotalBox").innerHTML = "Grand Total: ₹0.00";
+      document.getElementById("adminSearchInfo").innerText = "Type employee username and click show.";
+      document.getElementById("searchEmployeeName").value = "";
+      currentAdminViewedEmployee = "";
+    }
+
+    function searchEmployeeData(){
+      const username = document.getElementById("searchEmployeeName").value.trim();
+      const employees = getEmployees();
+
+      if(username === ""){
+        alert("Please enter employee username");
+        return;
+      }
+
+      if(!employees.includes(username)){
+        alert("Employee not found");
+        document.getElementById("adminBillBody").innerHTML = "";
+        document.getElementById("adminGrandTotalBox").innerHTML = "Grand Total: ₹0.00";
+        currentAdminViewedEmployee = "";
+        return;
+      }
+
+      currentAdminViewedEmployee = username;
+
+      const bills = getEmployeeBills(username);
+      const adminBillBody = document.getElementById("adminBillBody");
+      adminBillBody.innerHTML = "";
+
+      let grandTotal = 0;
+
+      bills.forEach((bill, index) => {
+        const row = adminBillBody.insertRow();
+        row.insertCell(0).innerHTML = index + 1;
+        row.insertCell(1).innerHTML = bill.customer;
+
+        let productHtml = "<ul class='product-list'>";
+        bill.products.forEach(product => {
+          productHtml += "<li>" + product.item +
+            " - Qty: " + product.qty +
+            " - Unit: ₹" + Number(product.unitPrice).toFixed(2) +
+            " - Total: ₹" + Number(product.total).toFixed(2) +
+            "</li>";
+        });
+        productHtml += "</ul>";
+
+        row.insertCell(2).innerHTML = productHtml;
+        row.insertCell(3).innerHTML = "₹" + Number(bill.billTotal).toFixed(2);
+
+        grandTotal += Number(bill.billTotal);
+      });
+
+      document.getElementById("adminSearchInfo").innerHTML = "Showing data for employee: <b>" + username + "</b>";
+      document.getElementById("adminGrandTotalBox").innerHTML = "Grand Total: ₹" + grandTotal.toFixed(2);
+    }
+
+    function downloadAdminEmployeeBills(){
+      if(currentAdminViewedEmployee === ""){
+        alert("First search and open employee record");
+        return;
+      }
+
+      const bills = getEmployeeBills(currentAdminViewedEmployee);
+
+      if(bills.length === 0){
+        alert("No bills available to download");
+        return;
+      }
+
+      let csvContent = "S.No,Customer,Products,Bill Total,Date\n";
+      let grandTotal = 0;
+
+      bills.forEach((bill, index) => {
+        let productText = "";
+        bill.products.forEach((product, pIndex) => {
+          productText += (pIndex + 1) + ". " +
+            product.item +
+            " Qty:" + product.qty +
+            " UnitPrice:" + product.unitPrice +
+            " Total:" + product.total + " | ";
+        });
+
+        csvContent += `${index + 1},"${bill.customer}","${productText}",${bill.billTotal},"${bill.date}"\n`;
+        grandTotal += Number(bill.billTotal);
+      });
+
+      csvContent += `\n,,Grand Total,${grandTotal.toFixed(2)},`;
+
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = currentAdminViewedEmployee + "_bills.csv";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    function deleteEmployeeData(){
+      const username = document.getElementById("searchEmployeeName").value.trim();
+      const employees = getEmployees();
+
+      if(username === ""){
+        alert("Please enter employee username");
+        return;
+      }
+
+      if(!employees.includes(username)){
+        alert("Employee not found");
+        return;
+      }
+
+      const confirmDelete = confirm("Delete all stored billing data for " + username + "?");
+      if(confirmDelete){
+        localStorage.setItem("bills_" + username, JSON.stringify([]));
+        document.getElementById("adminBillBody").innerHTML = "";
+        document.getElementById("adminGrandTotalBox").innerHTML = "Grand Total: ₹0.00";
+        document.getElementById("adminSearchInfo").innerHTML = "Data deleted for employee: <b>" + username + "</b>";
+        currentAdminViewedEmployee = username;
+        alert("Employee data deleted successfully");
+      }
+    }
+
+    window.onload = function(){
+      goHome();
+    };
+  </script>
+</body>
+</html>
